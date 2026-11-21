@@ -1,0 +1,40 @@
+<UserControl
+    x:Class="DutyRoster.Notifications.DutyNotificationProviderSettingsControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <StackPanel Spacing="10" Margin="0,6,0,0">
+
+    <ToggleSwitch Name="EnabledSwitch" OnContent="启用值日提醒" OffContent="已关闭值日提醒" />
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="提前提醒" VerticalAlignment="Center" />
+      <NumericUpDown Name="LeadSecondsSpin" Width="140"
+                     Minimum="0" Maximum="3600" Increment="30" FormatString="0"
+                     ShowButtonSpinner="False" />
+      <TextBlock Text="秒（0 表示准点提醒）" VerticalAlignment="Center" Opacity="0.7" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock Text="遮罩文本模板" />
+      <TextBox Name="MaskTemplateBox" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock Text="正文模板" />
+      <TextBox Name="ContentTemplateBox" AcceptsReturn="True" MinHeight="64" />
+    </StackPanel>
+
+    <ToggleSwitch Name="SpeechSwitch" OnContent="朗读值日内容" OffContent="不朗读" />
+
+    <TextBlock Opacity="0.6" FontSize="12" TextWrapping="Wrap"
+               Text="占位符：{}{group} 组名 · {}{types} 单行 · {}{typesLines} 多行 · {}{type} 首个类型名 · {}{name} 该类型同学 · {}{schedule} 时段 · {}{date} 日期 · {}{table} 表名" />
+
+    <TextBlock Opacity="0.6" FontSize="12" TextWrapping="Wrap"
+               Text="例如「请{}{name}同学擦黑板」，Action 选择单个类型时 {}{name} 即该类型同学。" />
+
+    <TextBlock Opacity="0.6" FontSize="12" TextWrapping="Wrap"
+               Text="提醒的音量、样式、是否置顶等，请在左侧「提醒」页统一设置。" />
+
+  </StackPanel>
+</UserControl>

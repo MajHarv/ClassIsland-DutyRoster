@@ -1,0 +1,59 @@
+<ci:ActionSettingsControlBase
+    x:Class="DutyRoster.Automation.DutyRemindActionSettingsControl"
+    x:TypeArguments="automation:DutyRemindActionSettings"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ci="clr-namespace:ClassIsland.Core.Abstractions.Controls;assembly=ClassIsland.Core"
+    xmlns:automation="clr-namespace:DutyRoster.Automation">
+
+  <StackPanel Spacing="8">
+
+    <ToggleSwitch Name="UseCurrentGroupSwitch"
+                  OnContent="提醒当前轮到的组" OffContent="手动指定组" />
+
+    <StackPanel Name="ManualGroupPanel" Orientation="Horizontal" Spacing="8" IsVisible="False">
+      <TextBlock Text="组" VerticalAlignment="Center" />
+      <NumericUpDown Name="GroupIndexSpin" Width="120" Minimum="1" Maximum="99"
+                     Increment="1" FormatString="0" ShowButtonSpinner="False" />
+    </StackPanel>
+
+    <ComboBox Name="DutyTypeCombo" HorizontalAlignment="Stretch"
+              ToolTip.Tip="选择要提醒的值日类别，留空表示提醒全部" />
+
+    <StackPanel Spacing="4">
+      <TextBlock Text="遮罩文本模板" FontSize="12" Opacity="0.6" />
+      <TextBox Name="MaskTemplateBox" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock Text="正文模板" FontSize="12" Opacity="0.6" />
+      <TextBox Name="ContentTemplateBox" />
+      <TextBlock FontSize="11" Opacity="0.5" TextWrapping="Wrap"
+                 Text="占位符：{}{types} 单行 · {}{typesLines} 多行 · {}{name} 该类型同学 · {}{type} 类型名。例如「请{}{name}同学擦黑板」" />
+    </StackPanel>
+
+    <ToggleSwitch Name="SpeechSwitch" OnContent="朗读提醒内容" OffContent="不朗读" />
+
+    <Separator Margin="0,4" />
+
+    <TextBlock Text="显示时长" FontSize="12" Opacity="0.6" />
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="标题" VerticalAlignment="Center" />
+      <NumericUpDown Name="MaskDurationSpin" Width="110" Minimum="0.5" Maximum="60"
+                     Increment="1" FormatString="0.0"
+                     ShowButtonSpinner="False" />
+      <TextBlock Text="秒" VerticalAlignment="Center" Opacity="0.7" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="正文" VerticalAlignment="Center" />
+      <NumericUpDown Name="ContentDurationSpin" Width="110" Minimum="0.5" Maximum="60"
+                     Increment="1" FormatString="0.0"
+                     ShowButtonSpinner="False" />
+      <TextBlock Text="秒" VerticalAlignment="Center" Opacity="0.7" />
+    </StackPanel>
+
+  </StackPanel>
+
+</ci:ActionSettingsControlBase>

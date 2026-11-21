@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>DutyRoster</AssemblyName>
+    <RootNamespace>DutyRoster</RootNamespace>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0.0</Version>
+    <!-- 由 ClassIsland.PluginSdk.targets 在构建后打包成 cipx -->
+    <CreateCipx>true</CreateCipx>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <!-- 打包脚本的 PowerShell 路径见 Directory.Build.targets -->
+
+  <ItemGroup>
+    <!-- ClassIsland 运行时自带全部依赖，插件只编译引用、不复制运行时与原生库 -->
+    <PackageReference Include="ClassIsland.PluginSdk" Version="2.0.0.2">
+      <ExcludeAssets>runtime; native</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="manifest.yml" CopyToOutputDirectory="Always" />
+    <None Include="icon.png" CopyToOutputDirectory="Always" />
+    <None Include="README.md" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <!-- ExcludeAssets 只会清空 runtimes 目录内容而保留空目录，打包前把空目录去掉 -->
+  <Target Name="CleanEmptyRuntimeDirs" AfterTargets="Build">
+    <ItemGroup>
+      <_EmptyRuntimeDir Include="$(OutputPath)runtimes\**" />
+    </ItemGroup>
+    <RemoveDir Directories="@(_EmptyRuntimeDir)" />
+  </Target>
+
+</Project>

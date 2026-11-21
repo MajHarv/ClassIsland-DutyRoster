@@ -1,0 +1,10 @@
+<Project>
+
+  <!-- ClassIsland.PluginSdk.targets 在项目属性之后导入，且无条件把打包脚本设成 pwsh。
+       Windows 上可能只安装了 Windows PowerShell，因此在更晚的导入位置覆盖回 powershell.exe；
+       Linux / macOS 保持 SDK 默认的 pwsh。generate-md5.ps1 只使用 PowerShell 5 兼容语法。 -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <PowershellBinaryName>powershell.exe</PowershellBinaryName>
+  </PropertyGroup>
+
+</Project>

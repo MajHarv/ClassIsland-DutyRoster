@@ -1,0 +1,27 @@
+<UserControl
+    x:Class="DutyRoster.Automation.DutyTimeStartTriggerSettingsControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ci="clr-namespace:ClassIsland.Core.Abstractions.Controls;assembly=ClassIsland.Core">
+
+  <StackPanel Spacing="10">
+
+    <StackPanel Spacing="4">
+      <TextBlock Text="监听的时段" />
+      <ComboBox Name="ScheduleCombo" HorizontalAlignment="Stretch" MinWidth="180" />
+      <TextBlock Opacity="0.6" FontSize="12"
+                 Text="选择「任意时段」时，每个值日时段开始都会触发。" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="提前 / 延后" VerticalAlignment="Center" />
+      <NumericUpDown Name="OffsetSpin" Width="140"
+                     Minimum="-3600" Maximum="3600" Increment="30" FormatString="0"
+                     ShowButtonSpinner="False" />
+      <TextBlock Text="秒（负数表示延后）" VerticalAlignment="Center" Opacity="0.7" />
+    </StackPanel>
+
+    <ToggleSwitch Name="RequireDutySwitch" OnContent="仅当天有值日安排时触发" OffContent="无论是否有值日都触发" />
+
+  </StackPanel>
+</UserControl>

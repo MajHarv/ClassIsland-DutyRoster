@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*.*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish plugin (cipx)
+        run: dotnet publish -c Release -p:CreateCipx=true
+
+      - name: Prepare release notes
+        shell: pwsh
+        run: |
+          $notes = @(
+            "值日提醒与排班 ${{ github.ref_name }}"
+            ""
+            "安装：下载下方 .cipx，在 ClassIsland 应用设置 → 插件 → 右上角 ... → 从文件安装，然后重启。"
+            ""
+            Get-Content ./cipx/checksums.md -Raw
+          ) -join "`n"
+          [IO.File]::WriteAllText("release-notes.md", $notes, [Text.UTF8Encoding]::new($false))
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: |
+            cipx/*.cipx
+            cipx/checksums.md
+          fail_on_unmatched_files: true

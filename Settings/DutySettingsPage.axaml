@@ -1,0 +1,327 @@
+<ci:SettingsPageBase
+    x:Class="DutyRoster.Settings.DutySettingsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ci="clr-namespace:ClassIsland.Core.Abstractions.Controls;assembly=ClassIsland.Core"
+    xmlns:settings="clr-namespace:DutyRoster.Settings"
+    xmlns:models="clr-namespace:DutyRoster.Models">
+
+  <ci:SettingsPageBase.Styles>
+
+    <!-- 行分隔线 -->
+    <Style Selector="Border.roster-row">
+      <Setter Property="BorderBrush" Value="#1A000000" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="0,6" />
+    </Style>
+    <Style Selector="Border.roster-row:pointerover">
+      <Setter Property="Background" Value="#08000000" />
+    </Style>
+
+    <!-- 行头色块 -->
+    <Style Selector="Border.swatch">
+      <Setter Property="Width" Value="6" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Margin" Value="0,2,8,2" />
+    </Style>
+
+    <!-- 表头 -->
+    <Style Selector="Border.col-header">
+      <Setter Property="Background" Value="#0F000000" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="4,6" />
+      <Setter Property="Margin" Value="3" />
+    </Style>
+
+    <Style Selector="Button.tool">
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+    <Style Selector="Button.danger">
+      <Setter Property="Foreground" Value="#E53935" />
+    </Style>
+
+  </ci:SettingsPageBase.Styles>
+
+  <TabControl Name="MainTabs" SelectedIndex="0">
+
+    <!-- ═══════════ 值日表 ═══════════ -->
+    <TabItem Header="值日表">
+      <Grid RowDefinitions="Auto,*" Margin="16,12">
+
+        <!-- 工具条 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,14">
+          <TextBox Name="TableNameBox" Width="150" VerticalContentAlignment="Center"
+                   Watermark="表名" />
+
+          <Border Width="1" Background="#1A000000" Margin="4,2" />
+
+          <Button Name="AddTypeBtn" Classes="tool" Content="＋ 类型" />
+          <Button Name="AddGroupBtn" Classes="tool" Content="＋ 组" />
+          <Button Name="RemoveTypeBtn" Classes="tool danger" Content="删除类型" />
+          <Button Name="RemoveGroupBtn" Classes="tool danger" Content="删除组" />
+
+          <Border Width="1" Background="#1A000000" Margin="4,2" />
+
+          <Button Name="SaveBtn" Classes="tool" Content="保存" />
+          <Button Name="ResetBtn" Classes="tool" Content="重置为空白表" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+          <StackPanel>
+
+            <!-- 表头：组名 -->
+            <Grid Name="HeaderGrid" ColumnDefinitions="210,*" IsVisible="False" Margin="0,0,0,4">
+              <TextBlock Text="值日类型" VerticalAlignment="Center"
+                         FontSize="12" Opacity="0.55" Margin="14,0,0,0" />
+              <ListBox Grid.Column="1" Name="HeaderItems"
+                       Background="Transparent" BorderThickness="0" Padding="0">
+                <ListBox.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Rows="1" />
+                  </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="settings:RosterColumn">
+                    <Border Classes="col-header">
+                      <TextBox Text="{Binding GroupName}" FontWeight="SemiBold"
+                               HorizontalContentAlignment="Center"
+                               Background="Transparent" BorderThickness="0"
+                               Padding="0" MinHeight="26" />
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Grid>
+
+            <!-- 每行一个值日类型 -->
+            <ListBox Name="RowsItems"
+                     Background="Transparent" BorderThickness="0" Padding="0">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="settings:RosterRow">
+                  <Border Classes="roster-row">
+                    <Grid ColumnDefinitions="210,*">
+
+                      <!-- 行头：整体包在一个边框里，色块位于边框内左侧 -->
+                      <Border Grid.Column="0" Background="#0A000000" CornerRadius="6"
+                              Padding="0" Margin="6,2,10,2" ClipToBounds="True">
+                        <Grid ColumnDefinitions="6,*,58,84">
+                          <Border Grid.Column="0" Background="{Binding ColorBrush}" />
+
+                          <TextBox Grid.Column="1" Text="{Binding TypeName}"
+                                   Margin="8,0,6,0" VerticalContentAlignment="Center"
+                                   MinHeight="32" FontWeight="SemiBold"
+                                   Background="Transparent" BorderThickness="0" />
+
+                          <ComboBox Grid.Column="2" ItemsSource="{Binding ColorOptions}"
+                                    SelectedItem="{Binding SelectedColorOption}"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                    Margin="0,0,4,0" MinHeight="28" Padding="6,0"
+                                    ToolTip.Tip="颜色">
+                            <ComboBox.ItemTemplate>
+                              <DataTemplate x:DataType="settings:ColorOption">
+                                <Border Width="24" Height="10" CornerRadius="2"
+                                        Background="{Binding Brush}" />
+                              </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                          </ComboBox>
+
+                          <NumericUpDown Grid.Column="3" Value="{Binding RequiredPeople}"
+                                         Minimum="0" Maximum="20"
+                                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                         Margin="0,0,6,0" MinHeight="28" FontSize="11"
+                                         Increment="1" FormatString="0"
+                                         ShowButtonSpinner="False"
+                                         ToolTip.Tip="每格人数，0 为不限" />
+                        </Grid>
+                      </Border>
+
+                      <!-- 人员格 -->
+                      <ItemsControl Grid.Column="1" ItemsSource="{Binding Cells}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="settings:RosterCell">
+                            <TextBox Text="{Binding PeopleText}" Margin="3,0"
+                                     MinHeight="34" VerticalContentAlignment="Center" />
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </TabItem>
+
+    <!-- ═══════════ 轮换 ═══════════ -->
+    <TabItem Header="轮换">
+      <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12" MaxWidth="760" HorizontalAlignment="Left">
+
+          <Border Background="#0F000000" CornerRadius="8" Padding="16">
+            <StackPanel Spacing="12">
+              <ComboBox Name="PresetCombo" HorizontalAlignment="Stretch" MinHeight="32" />
+              <TextBlock Name="PresetDescText" Opacity="0.6" FontSize="12" TextWrapping="Wrap" />
+
+              <Grid ColumnDefinitions="Auto,*" Margin="0,4,0,0">
+                <TextBlock Text="起始日期" VerticalAlignment="Center" Width="72" />
+                <DatePicker Grid.Column="1" Name="StartDatePicker" HorizontalAlignment="Left" />
+              </Grid>
+
+              <Grid Name="BiweeklyPanel" ColumnDefinitions="Auto,*" IsVisible="False">
+                <TextBlock Text="半周期组数" VerticalAlignment="Center" Width="72" />
+                <NumericUpDown Grid.Column="1" Name="BiweeklySpin" Width="120"
+                               Minimum="0" Maximum="60" FormatString="0"
+                               ShowButtonSpinner="False" />
+              </Grid>
+
+              <Border Background="#104CAF50" CornerRadius="6" Padding="12,10">
+                <StackPanel Spacing="10">
+                  <TextBlock Name="RotationStatusText" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                  <!-- 手动设置当前组 -->
+                  <Grid ColumnDefinitions="Auto,Auto,Auto,*" Margin="0,4,0,0">
+                    <TextBlock Text="当前设为" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Name="CurrentGroupSpin" Width="90"
+                                   Minimum="1" Maximum="99" Increment="1" FormatString="0"
+                                   ShowButtonSpinner="False" Margin="8,0" />
+                    <TextBlock Grid.Column="2" Text="组" VerticalAlignment="Center" />
+                    <Button Grid.Column="3" Name="SetCurrentGroupBtn" Content="应用"
+                            HorizontalAlignment="Left" Margin="12,0,0,0" Padding="14,4" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <Border Background="#0F000000" CornerRadius="8" Padding="16">
+            <StackPanel Spacing="12">
+              <TextBlock Text="跳过" FontWeight="Bold" FontSize="14" />
+              <StackPanel Orientation="Horizontal" Spacing="2" Name="SkipDayPanel" />
+
+              <Grid ColumnDefinitions="Auto,Auto,Auto,*" Margin="0,4,0,0">
+                <DatePicker Name="ExtraSkipPicker" />
+                <Button Grid.Column="1" Name="AddSkipDateBtn" Content="添加" Margin="8,0" />
+                <Button Grid.Column="2" Name="ClearSkipDatesBtn" Content="清空" />
+              </Grid>
+              <ListBox Name="ExtraSkipList" MaxHeight="120" />
+            </StackPanel>
+          </Border>
+
+          <Border Background="#0F000000" CornerRadius="8" Padding="16">
+            <StackPanel Spacing="8">
+              <TextBlock Text="未来 14 天" FontWeight="Bold" FontSize="14" />
+              <ItemsControl Name="PreviewItems">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="settings:PreviewRow">
+                    <Grid ColumnDefinitions="64,52,*" Margin="0,3">
+                      <TextBlock Grid.Column="0" Text="{Binding Date}" FontSize="12" />
+                      <TextBlock Grid.Column="1" Text="{Binding Weekday}" FontSize="12" Opacity="0.6" />
+                      <TextBlock Grid.Column="2" Text="{Binding Group}" FontSize="12" FontWeight="SemiBold" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+
+    <!-- ═══════════ 时段 ═══════════ -->
+    <TabItem Header="时段">
+      <Grid RowDefinitions="Auto,*" Margin="16,12">
+        <Button Grid.Row="0" Name="AddScheduleBtn" Content="＋ 时段"
+                HorizontalAlignment="Left" Margin="0,0,0,14" Padding="14,6" />
+
+        <ScrollViewer Grid.Row="1">
+          <StackPanel Spacing="6" MaxWidth="760" HorizontalAlignment="Left">
+            <ItemsControl Name="ScheduleItems">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="models:DutySchedule">
+                  <Border Background="#0F000000" CornerRadius="8" Padding="12" Margin="0,0,0,6">
+                    <Grid ColumnDefinitions="*,84,84,Auto,Auto">
+                      <TextBox Grid.Column="0" Text="{Binding Name}" Margin="0,0,8,0"
+                               Watermark="时段名" VerticalContentAlignment="Center" MinHeight="32" />
+                      <TextBox Grid.Column="1" Text="{Binding StartText}" Margin="0,0,6,0"
+                               Watermark="07:30" VerticalContentAlignment="Center" MinHeight="32" />
+                      <TextBox Grid.Column="2" Text="{Binding EndText}" Margin="0,0,10,0"
+                               Watermark="08:00" VerticalContentAlignment="Center" MinHeight="32" />
+                      <CheckBox Grid.Column="3" Content="提醒" IsChecked="{Binding AllowReminder}"
+                                VerticalAlignment="Center" Margin="0,0,10,0" />
+                      <Button Grid.Column="4" Content="删除" Classes="danger"
+                              Tag="{Binding}" Click="OnDeleteSchedule" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+      </Grid>
+    </TabItem>
+
+    <!-- ═══════════ 班级名单 ═══════════ -->
+    <TabItem Header="班级名单">
+      <Grid RowDefinitions="Auto,Auto,*" Margin="16,12">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+          <Button Name="ImportStudentsBtn" Content="导入" Padding="14,6" />
+          <Button Name="ExportStudentsBtn" Content="导出" Padding="14,6" />
+          <Button Name="ClearStudentsBtn" Content="清空" Classes="danger" Padding="14,6" />
+          <Border Width="1" Background="#1A000000" Margin="4,2" />
+          <Button Name="PickRandomBtn" Content="随机点名" Padding="14,6" />
+          <TextBlock Name="PickResultText" VerticalAlignment="Center" FontWeight="SemiBold"
+                     FontSize="15" Margin="6,0,0,0" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Name="StudentsCountText" FontSize="11" Opacity="0.5"
+                   Margin="0,0,0,8" />
+
+        <TextBox Grid.Row="2" Name="StudentsBox" AcceptsReturn="True"
+                 TextWrapping="NoWrap" FontFamily="Consolas,Microsoft YaHei"
+                 Watermark="01 张三&#x0a;02 李四&#x0a;03 王五" />
+      </Grid>
+    </TabItem>
+
+    <!-- ═══════════ 其他 ═══════════ -->
+    <TabItem Header="其他">
+      <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12" MaxWidth="760" HorizontalAlignment="Left">
+
+          <Border Background="#0F000000" CornerRadius="8" Padding="16">
+            <StackPanel Spacing="14">
+              <ToggleSwitch Name="EnabledSwitch" OnContent="启用值日提醒与排班" OffContent="已停用" />
+              <ToggleSwitch Name="NotifySwitch" OnContent="发送值日提醒" OffContent="不发送提醒" />
+              <CheckBox Name="ShowOnlyCurrentCheck" Content="仅在值日时段内显示" />
+            </StackPanel>
+          </Border>
+
+          <Border Background="#0F000000" CornerRadius="8" Padding="16">
+            <StackPanel Spacing="12">
+              <TextBlock Text="数据" FontWeight="Bold" FontSize="14" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Name="ExportBtn" Content="导出…" Padding="14,6" />
+                <Button Name="ImportBtn" Content="导入…" Padding="14,6" />
+              </StackPanel>
+              <TextBlock Name="DataPathText" FontSize="11" Opacity="0.45" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <TextBlock Name="RandomRosterHint" FontSize="11" Opacity="0.45" TextWrapping="Wrap" />
+
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+
+  </TabControl>
+
+</ci:SettingsPageBase>

@@ -1,0 +1,19 @@
+# 构建产物
+bin/
+obj/
+cipx/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 本地配置与日志
+errors.log
+duty_roster.json
